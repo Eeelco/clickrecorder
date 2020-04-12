@@ -92,10 +92,10 @@ def b3click():
     i = 1
     while running:
         i = i % nr_points
-        try:
-            moveDur = float(duration_inputs[(i-1) % nr_points].get())
-        except:
-            moveDur = float(default_delay.get())
+        # try:
+        moveDur = float(duration_inputs[(i-1) % nr_points].get())
+        # except:
+            # moveDur = float(default_delay.get())
         moveTo(positions[i][0],positions[i][1], duration=moveDur)
         click()
         i += 1
