@@ -139,11 +139,21 @@ lbl3.grid(column=3, row = 1)
 
 init_delay_entry = Entry(window,textvariable=init_delay)
 init_delay_entry.grid(column=3,row=2)
+def fill_ini(event=None):
+    content = init_delay_entry.get()
+    if content == '':
+        init_delay_entry.insert(0,'1')
+init_delay_entry.bind('<FocusOut>',fill_ini)
 
 lbl4 = Label(window,text="Default delay in s")
 lbl4.grid(column=3, row = 3)
 
 default_delay_entry = Entry(window,textvariable=default_delay)
 default_delay_entry.grid(column=3,row=4)
+def fill_default(event=None):
+    content = default_delay_entry.get()
+    if content == '':
+        default_delay_entry.insert(0,'1')
+default_delay_entry.bind('<FocusOut>',fill_default)
 
 window.mainloop()
