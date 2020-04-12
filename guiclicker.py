@@ -21,7 +21,7 @@ window.rowconfigure(0,pad=30)
 window.columnconfigure(0,weight=2)
 window.columnconfigure(1,weight=4)
 window.columnconfigure(2,weight=1)
-window.columnconfigure(3,weight=1)
+window.columnconfigure(3,weight=2)
 b1_text = StringVar(window)
 b3_text = StringVar(window)
 rec_dur = IntVar(window)
@@ -64,12 +64,14 @@ def b1click():
 
 def b2click():
     global recording, positions, running, position_labels, duration_inputs, durations
-    positions = []
-    durations = []
     for label in position_labels:
         label.grid_forget()
     for i in duration_inputs:
         i.grid_forget()
+    positions = []
+    durations = []
+    position_labels = []
+    duration_inputs = []
     recording = False
     running = False
     b3_text.set("Start clicks")
