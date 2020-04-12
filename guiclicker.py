@@ -26,6 +26,10 @@ b1_text = StringVar(window)
 b3_text = StringVar(window)
 rec_dur = IntVar(window)
 
+b1_text.set("Start recording")
+b3_text.set("Start")
+
+
 def on_click(x,y,button,pressed):
     if recording and pressed:
         if rec_dur.get():
@@ -40,9 +44,6 @@ def on_scroll(x,y,dx,dy):
 listener = Listener(on_click=on_click,on_scroll=on_scroll)
 listener.start()
 
-b1_text.set("Start recording")
-b3_text.set("Start")
-
 
 def b1click():
     global recording
@@ -53,7 +54,7 @@ def b1click():
         positions.pop()
         if rec_dur.get():
             durations.pop()
-        make_duration_inputs()
+        make_inputs()
         b1_text.set("Start recording")
         recording = False
 
@@ -88,7 +89,7 @@ def b3click():
         click()
         i += 1
 
-def make_duration_inputs():
+def make_inputs():
     global position_labels, duration_inputs
     for label in position_labels:
         label.grid_forget()
