@@ -1,7 +1,7 @@
-from tkinter import (Tk, StringVar, IntVar, Entry, Label, Button, Checkbutton)
+from tkinter import (Tk, StringVar, IntVar, Entry, Label, Button, Checkbutton, filedialog, END)
 from pyautogui import moveTo, click
 from pynput.mouse import Listener
-from datetime import datetime
+from datetime import datetime,timedelta
 from time import sleep
 
 positions = []
@@ -49,7 +49,7 @@ listener = Listener(on_click=on_click,on_scroll=on_scroll)
 listener.start()
 
 
-def b1click():
+def record_click():
     global recording
     if not recording:
         b1_text.set("Stop recording")
@@ -62,7 +62,7 @@ def b1click():
         b1_text.set("Start recording")
         recording = False
 
-def b2click():
+def reset_click():
     global recording, positions, running, position_labels, duration_inputs, durations
     for label in position_labels:
         label.grid_forget()
@@ -78,7 +78,7 @@ def b2click():
     b1_text.set("Start recording")
     window.update()
 
-def b3click():
+def run_click():
     global running,duration_inputs
     b3_text.set("Running")
     window.update()
@@ -100,6 +100,39 @@ def b3click():
         click()
         i += 1
 
+def save_click():
+    outfile = filedialog.asksaveasfilename(title="Filename",filetypes=(("Click save files", "*.cls"),("all files","*")))
+    with open(outfile,'w') as o:
+        for i in range(len(positions)):
+            o.write("{}\t{}\t{}\n".format(positions[i][0],positions[i][1],duration_inputs[i].get()))
+
+def load_click():
+    global duration_inputs
+
+    reset_button.invoke()
+    infile = filedialog.askopenfilename(title="Filename",filetypes=(("Click save files", "*.cls"),("all files","*")))
+    f = open(infile,'r').readlines()
+
+    rec_dur.set(1)
+    last_delay = 0
+    ts = datetime.fromtimestamp(0)
+    for line in f:
+        x,y,delay = [float(s) for s in line.split()]
+        positions.append([x,y])
+        if durations == []:
+            durations.append(ts)
+        else:
+            durations.append(durations[-1] + timedelta(seconds=last_delay))
+        last_delay = delay
+
+    make_inputs()
+    duration_inputs[-1].delete(0,END)
+    duration_inputs[-1].insert(0,last_delay)
+    rec_dur.set(0)
+
+
+
+
 def make_inputs():
     global position_labels, duration_inputs, durations
 
@@ -118,14 +151,14 @@ def make_inputs():
     durations = []
 
 
-btn1 = Button(window,textvariable=b1_text, command = b1click)
-btn1.grid(column=0,row=0)
+record_button = Button(window,textvariable=b1_text, command = record_click)
+record_button.grid(column=0,row=0)
 
-btn2 = Button(window, text="Reset",command = b2click)
-btn2.grid(column=2,row=0)
+reset_button = Button(window, text="Reset",command = reset_click)
+reset_button.grid(column=2,row=0)
 
-btn3 = Button(window, textvariable=b3_text,command = b3click)
-btn3.grid(column=1,row=0)
+run_button = Button(window, textvariable=b3_text,command = run_click)
+run_button.grid(column=1,row=0)
 
 lbl = Label(window, text="Positions")
 lbl.grid(column=0,row=1)
@@ -157,5 +190,11 @@ def fill_default(event=None):
     if content == '':
         default_delay_entry.insert(0,'1')
 default_delay_entry.bind('<FocusOut>',fill_default)
+
+save_button = Button(window, text="Save", command = save_click)
+save_button.grid(column=3,row=5)
+
+load_button = Button(window, text="Load", command = load_click)
+load_button.grid(column=3,row=6)
 
 window.mainloop()
