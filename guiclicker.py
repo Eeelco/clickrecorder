@@ -1,4 +1,4 @@
-from tkinter import (Tk, StringVar, IntVar, Entry, Label, Button, Checkbutton, filedialog, END)
+from tkinter import (Tk, StringVar, IntVar, Entry, Label, Button, Checkbutton, filedialog, END, messagebox)
 from pyautogui import moveTo, click
 from pynput.mouse import Listener
 from datetime import datetime,timedelta
@@ -107,7 +107,9 @@ def save_click():
             o.write("{}\t{}\t{}\n".format(positions[i][0],positions[i][1],duration_inputs[i].get()))
 
 def load_click():
-    global duration_inputs
+    # import pdb
+    # pdb.set_trace()
+    global duration_inputs, durations, positions
 
     reset_button.invoke()
     infile = filedialog.askopenfilename(title="Filename",filetypes=(("Click save files", "*.cls"),("all files","*")))
@@ -117,13 +119,20 @@ def load_click():
     last_delay = 0
     ts = datetime.fromtimestamp(0)
     for line in f:
-        x,y,delay = [float(s) for s in line.split()]
-        positions.append([x,y])
-        if durations == []:
-            durations.append(ts)
-        else:
-            durations.append(durations[-1] + timedelta(seconds=last_delay))
-        last_delay = delay
+        try:
+            x,y,delay = [float(s) for s in line.split()]
+            positions.append([x,y])
+            if durations == []:
+                durations.append(ts)
+            else:
+                durations.append(durations[-1] + timedelta(seconds=last_delay))
+            last_delay = delay
+        except:
+            durations = []
+            positions = []
+            messagebox.showerror(title='File load error', message = 'Error loading file')
+            return
+
 
     make_inputs()
     duration_inputs[-1].delete(0,END)
