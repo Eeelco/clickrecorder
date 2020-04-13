@@ -115,7 +115,10 @@ def load_click():
 
     reset_button.invoke()
     infile = filedialog.askopenfilename(title="Filename",filetypes=(("Click save files", "*.cls"),("all files","*")))
-    f = open(infile,'r').readlines()
+    try:
+        f = open(infile,'r').readlines()
+    except:
+        return
 
     rec_dur.set(1)
     last_delay = 0
