@@ -1,15 +1,17 @@
 from tkinter import (Tk, StringVar, IntVar, Entry, Label, Button, Checkbutton, filedialog, END, messagebox)
 from pyautogui import moveTo, click
 from pynput.mouse import Listener
+from pynput.mouse import Button as Btn
 from datetime import datetime,timedelta
 from time import sleep
 
 positions = []
 move_times = []
+buttons = []
 
 position_labels = []
-duration_inputs = []
-durations = []
+delay_inputs = []
+delays = []
 
 recording = False
 running = False
@@ -35,10 +37,11 @@ default_delay.set("1")
 
 
 def on_click(x,y,button,pressed):
-    if recording and pressed:
+    if recording and pressed and (button == Btn.left or button == Btn.right):
         if rec_dur.get():
-            durations.append(datetime.now())
+            delays.append(datetime.now())
         positions.append([x,y])
+        buttons.append('left' if button == Btn.left else 'right')
 
 def on_scroll(x,y,dx,dy):
     global running, b3_text
@@ -57,21 +60,22 @@ def record_click():
     else:
         positions.pop()
         if rec_dur.get():
-            durations.pop()
+            delays.pop()
         make_inputs()
         b1_text.set("Start recording")
         recording = False
 
 def reset_click():
-    global recording, positions, running, position_labels, duration_inputs, durations
+    global recording, positions, running, position_labels, delay_inputs, delays, buttons
     for label in position_labels:
         label.grid_forget()
-    for i in duration_inputs:
+    for i in delay_inputs:
         i.grid_forget()
     positions = []
-    durations = []
+    delays = []
     position_labels = []
-    duration_inputs = []
+    delay_inputs = []
+    buttons = []
     recording = False
     running = False
     b3_text.set("Start clicks")
@@ -79,7 +83,7 @@ def reset_click():
     window.update()
 
 def run_click():
-    global running,duration_inputs
+    global running,delay_inputs
     b3_text.set("Running")
     window.update()
     running = True
@@ -87,29 +91,27 @@ def run_click():
 
     initial_delay = float(init_delay.get())
     sleep(initial_delay)
-    click(x=positions[0][0],y=positions[0][1])
+    click(x=positions[0][0],y=positions[0][1],button=buttons[0])
 
     i = 1
     while running:
         i = i % nr_points
         # try:
-        moveDur = float(duration_inputs[(i-1) % nr_points].get())
+        moveDur = float(delay_inputs[(i-1) % nr_points].get())
         # except:
             # moveDur = float(default_delay.get())
         moveTo(positions[i][0],positions[i][1], duration=moveDur)
-        click()
+        click(button=buttons[i])
         i += 1
 
 def save_click():
     outfile = filedialog.asksaveasfilename(title="Filename",filetypes=(("Click save files", "*.cls"),("all files","*")))
     with open(outfile,'w') as o:
         for i in range(len(positions)):
-            o.write("{}\t{}\t{}\n".format(positions[i][0],positions[i][1],duration_inputs[i].get()))
+            o.write("{}\t{}\t{}\t{}\n".format(positions[i][0],positions[i][1],delay_inputs[i].get(),buttons[i]))
 
 def load_click():
-    # import pdb
-    # pdb.set_trace()
-    global duration_inputs, durations, positions
+    global delay_inputs, delays, positions, buttons
 
     reset_button.invoke()
     infile = filedialog.askopenfilename(title="Filename",filetypes=(("Click save files", "*.cls"),("all files","*")))
@@ -120,44 +122,44 @@ def load_click():
     ts = datetime.fromtimestamp(0)
     for line in f:
         try:
-            x,y,delay = [float(s) for s in line.split()]
+            line = line.split()
+            x = int(line[0]); y = int(line[1]); delay = float(line[2]); button = line[3]
             positions.append([x,y])
-            if durations == []:
-                durations.append(ts)
+            buttons.append(button)
+            if delays == []:
+                delays.append(ts)
             else:
-                durations.append(durations[-1] + timedelta(seconds=last_delay))
+                delays.append(delays[-1] + timedelta(seconds=last_delay))
             last_delay = delay
         except:
-            durations = []
+            delays = []
             positions = []
+            buttons = []
             messagebox.showerror(title='File load error', message = 'Error loading file')
             return
 
 
     make_inputs()
-    duration_inputs[-1].delete(0,END)
-    duration_inputs[-1].insert(0,last_delay)
+    delay_inputs[-1].delete(0,END)
+    delay_inputs[-1].insert(0,last_delay)
     rec_dur.set(0)
 
-
-
-
 def make_inputs():
-    global position_labels, duration_inputs, durations
+    global position_labels, delay_inputs, delays
 
     j = len(position_labels)
     for i in range(j,len(positions)):
         p = positions[i]
-        position_labels.append(Label(window,text = "x: {} y: {}".format(p[0],p[1])))
-        position_labels[i].grid(column=0,row=i+2)
+        position_labels.append(Label(window,text = f"{buttons[i][0].upper()} x: {p[0]:<4} y: {p[1]:<4}"))
+        position_labels[i].grid(column=0,row=i+2,sticky='w')
 
-        duration_inputs.append(Entry(window))
-        if  (i - j) < len(durations) - 1 and rec_dur.get():
-            duration_inputs[i].insert(0,str((durations[i-j+1] - durations[i-j]).total_seconds() ) )
+        delay_inputs.append(Entry(window))
+        if  (i - j) < len(delays) - 1 and rec_dur.get():
+            delay_inputs[i].insert(0,str((delays[i-j+1] - delays[i-j]).total_seconds() ) )
         else:
-            duration_inputs[i].insert(0,default_delay.get())
-        duration_inputs[i].grid(column=1,row=i+2)
-    durations = []
+            delay_inputs[i].insert(0,default_delay.get())
+        delay_inputs[i].grid(column=1,row=i+2)
+    delays = []
 
 
 record_button = Button(window,textvariable=b1_text, command = record_click)
@@ -175,7 +177,7 @@ lbl.grid(column=0,row=1)
 lbl2 = Label(window, text = "Click delay in s")
 lbl2.grid(column=1,row=1)
 
-chk1 = Checkbutton(window,text='Record\ndurations',variable=rec_dur)
+chk1 = Checkbutton(window,text='Record\ndelays',variable=rec_dur)
 chk1.grid(column=3,row=0)
 
 lbl3 = Label(window,text="Initial delay in s")
