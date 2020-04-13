@@ -130,6 +130,7 @@ def load_click():
             line = line.split()
             x = int(line[0]); y = int(line[1]); delay = float(line[2]); button = line[3]
             positions.append([x,y])
+            assert button in ['left','right']
             buttons.append(button)
             if delays == []:
                 delays.append(ts)
