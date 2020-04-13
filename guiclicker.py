@@ -18,11 +18,11 @@ running = False
 
 window = Tk()
 window.title("Click recorder")
-window.geometry('500x300')
 window.rowconfigure(0,pad=30)
-window.columnconfigure(0,minsize=120)
+window.columnconfigure(0,minsize=120,pad=30)
 window.columnconfigure(1,minsize=180)
 window.columnconfigure(2,minsize=50)
+window.columnconfigure(3,pad=30)
 
 b1_text = StringVar(window)
 b3_text = StringVar(window)
@@ -85,6 +85,8 @@ def reset_click():
 def run_click():
     global running,delay_inputs
     b3_text.set("Running")
+    if recording:
+        record_click()
     window.update()
     running = True
     nr_points = len(positions)
