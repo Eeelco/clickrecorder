@@ -20,10 +20,6 @@ window = Tk()
 window.title("Click recorder")
 window.geometry('500x300')
 window.rowconfigure(0,pad=30)
-# window.columnconfigure(0,weight=2)
-# window.columnconfigure(1,weight=4)
-# window.columnconfigure(2,weight=1)
-# window.columnconfigure(3,weight=2)
 window.columnconfigure(0,minsize=120)
 window.columnconfigure(1,minsize=180)
 window.columnconfigure(2,minsize=50)
@@ -41,7 +37,7 @@ default_delay.set("1")
 
 
 def on_click(x,y,button,pressed):
-    if recording and pressed and (button == Btn.left or button == Btn.right):
+    if recording and pressed and button in [Btn.left,Btn.right]:
         if rec_dur.get():
             delays.append(datetime.now())
         positions.append([x,y])
