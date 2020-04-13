@@ -20,10 +20,14 @@ window = Tk()
 window.title("Click recorder")
 window.geometry('500x300')
 window.rowconfigure(0,pad=30)
-window.columnconfigure(0,weight=2)
-window.columnconfigure(1,weight=4)
-window.columnconfigure(2,weight=1)
-window.columnconfigure(3,weight=2)
+# window.columnconfigure(0,weight=2)
+# window.columnconfigure(1,weight=4)
+# window.columnconfigure(2,weight=1)
+# window.columnconfigure(3,weight=2)
+window.columnconfigure(0,minsize=120)
+window.columnconfigure(1,minsize=180)
+window.columnconfigure(2,minsize=50)
+
 b1_text = StringVar(window)
 b3_text = StringVar(window)
 rec_dur = IntVar(window)
@@ -161,7 +165,7 @@ def make_inputs():
             delay_inputs[i].insert(0,str((delays[i-j+1] - delays[i-j]).total_seconds() ) )
         else:
             delay_inputs[i].insert(0,default_delay.get())
-        delay_inputs[i].grid(column=1,row=i+2)
+        delay_inputs[i].grid(column=1,row=i+2,ipadx=5)
     delays = []
 
 
@@ -186,7 +190,7 @@ chk1.grid(column=3,row=0)
 lbl3 = Label(window,text="Initial delay in s")
 lbl3.grid(column=3, row = 1)
 
-init_delay_entry = Entry(window,textvariable=init_delay)
+init_delay_entry = Entry(window,textvariable=init_delay,width=10)
 init_delay_entry.grid(column=3,row=2)
 def fill_ini(event=None):
     content = init_delay_entry.get()
@@ -197,7 +201,7 @@ init_delay_entry.bind('<FocusOut>',fill_ini)
 lbl4 = Label(window,text="Default delay in s")
 lbl4.grid(column=3, row = 3)
 
-default_delay_entry = Entry(window,textvariable=default_delay)
+default_delay_entry = Entry(window,textvariable=default_delay,width=10)
 default_delay_entry.grid(column=3,row=4)
 def fill_default(event=None):
     content = default_delay_entry.get()
