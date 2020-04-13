@@ -1,6 +1,6 @@
 # clickrecorder
 Small script to record the positions of mouse clicks and repeat them automatically.
-[[file:./docs/gui.png]]
+![Snapshot of GUI](./docs/gui.png)
 ## Features
 - Record pattern of mouse clicks and repeat it infinitely
 - Either manually set delays between clicks or also record them
