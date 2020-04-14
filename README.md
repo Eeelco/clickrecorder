@@ -8,7 +8,7 @@ Small script to record the positions of mouse clicks and repeat them automatical
 - Save and load click patterns
 - Set inital delay before the script starts clicking
 - Scroll to stop the script from clicking
-- Currently, the upper speed limit is about 5 clicks per second
+- Currently, the upper speed limit is about 10 clicks per second if the delay is set to 0.
 
 ## Dependencies
 - Python 3.6+

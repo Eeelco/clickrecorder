@@ -4,6 +4,7 @@ from pynput.mouse import Listener
 from pynput.mouse import Button as Btn
 from datetime import datetime,timedelta
 from time import sleep
+from itertools import cycle
 
 positions = []
 move_times = []
@@ -89,22 +90,20 @@ def run_click():
         record_click()
     window.update()
     running = True
-    nr_points = len(positions)
+    indices = cycle(range(len(positions)))
+    delays = [float(delay_inputs[i].get()) if delay_inputs[i].get() != '' else float(default_delay.get()) for i in range(len(positions))]
+    delays = [delays[-1]] + delays[:-1]
 
     initial_delay = float(init_delay.get())
     sleep(initial_delay)
     click(x=positions[0][0],y=positions[0][1],button=buttons[0])
 
-    i = 1
-    while running:
-        i = i % nr_points
-        # try:
-        moveDur = float(delay_inputs[(i-1) % nr_points].get())
-        # except:
-            # moveDur = float(default_delay.get())
-        moveTo(positions[i][0],positions[i][1], duration=moveDur)
+    next(indices)
+    for i in indices:
+        if not running:
+            break
+        moveTo(positions[i][0],positions[i][1], duration=delays[i])
         click(button=buttons[i])
-        i += 1
 
 def save_click():
     outfile = filedialog.asksaveasfilename(title="Filename",filetypes=(("Click save files", "*.cls"),("all files","*")))
@@ -122,7 +121,6 @@ def load_click():
     except:
         return
 
-    rec_dur.set(1)
     last_delay = 0
     ts = datetime.fromtimestamp(0)
     for line in f:
@@ -145,10 +143,11 @@ def load_click():
             return
 
 
+    rec_dur.set(1)
     make_inputs()
+    rec_dur.set(0)
     delay_inputs[-1].delete(0,END)
     delay_inputs[-1].insert(0,last_delay)
-    rec_dur.set(0)
 
 def make_inputs():
     global position_labels, delay_inputs, delays
