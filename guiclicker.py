@@ -1,10 +1,14 @@
 from tkinter import (Tk, StringVar, IntVar, Entry, Label, Button, Checkbutton, filedialog, END, messagebox)
 from pyautogui import moveTo, click
+import pyautogui
 from pynput.mouse import Listener
 from pynput.mouse import Button as Btn
 from datetime import datetime,timedelta
 from time import sleep
 from itertools import cycle
+
+pyautogui.PAUSE = 0
+pyautogui.MINIMUM_DURATION = 0
 
 positions = []
 move_times = []
