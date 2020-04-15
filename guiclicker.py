@@ -117,7 +117,7 @@ def run_click():
         for i in indices:
             if not running:
                 break
-            target_pos = np.asarray(positions[i]) + np.random.randint(-10,11,size=2)
+            target_pos = np.asarray(positions[i]) + np.random.randint(-1,2,size=2)
             curve = random_bezier(np.asarray(pyautogui.position()), target_pos,0.2,node_nr)
             interval = delays[i] / (node_nr-1)
             for j in range(len(curve[0])):
