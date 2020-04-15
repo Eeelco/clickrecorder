@@ -6,6 +6,8 @@ from pynput.mouse import Button as Btn
 from datetime import datetime,timedelta
 from time import sleep
 from itertools import cycle
+from bezier import random_bezier
+import numpy as np
 
 pyautogui.PAUSE = 0
 pyautogui.MINIMUM_DURATION = 0
@@ -32,6 +34,7 @@ window.columnconfigure(3,pad=30)
 b1_text = StringVar(window)
 b3_text = StringVar(window)
 rec_dur = IntVar(window)
+human_like = IntVar(window)
 init_delay = StringVar(window)
 default_delay = StringVar(window)
 
@@ -89,6 +92,7 @@ def reset_click():
 
 def run_click():
     global running,delay_inputs
+    node_nr = 4
     b3_text.set("Running")
     if recording:
         record_click()
@@ -103,11 +107,22 @@ def run_click():
     click(x=positions[0][0],y=positions[0][1],button=buttons[0])
 
     next(indices)
-    for i in indices:
-        if not running:
-            break
-        moveTo(positions[i][0],positions[i][1], duration=delays[i])
-        click(button=buttons[i])
+    if not human_like.get():
+        for i in indices:
+            if not running:
+                break
+            moveTo(positions[i][0],positions[i][1], duration=delays[i])
+            click(button=buttons[i])
+    else:
+        for i in indices:
+            if not running:
+                break
+            target_pos = np.asarray(positions[i]) + np.random.randint(-10,11,size=2)
+            curve = random_bezier(np.asarray(pyautogui.position()), target_pos,0.2,node_nr)
+            interval = delays[i] / (node_nr-1)
+            for j in range(len(curve[0])):
+                moveTo(curve[0][j],curve[1][j],duration=interval)
+            click(button=buttons[i])
 
 def save_click():
     outfile = filedialog.asksaveasfilename(title="Filename",filetypes=(("Click save files", "*.cls"),("all files","*")))
@@ -189,11 +204,14 @@ lbl2.grid(column=1,row=1)
 chk1 = Checkbutton(window,text='Record\ndelays',variable=rec_dur)
 chk1.grid(column=3,row=0)
 
+chk2 = Checkbutton(window,text='Human-like\nmovement',variable=human_like)
+chk2.grid(column=3,row=1)
+
 lbl3 = Label(window,text="Initial delay in s")
-lbl3.grid(column=3, row = 1)
+lbl3.grid(column=3, row = 2)
 
 init_delay_entry = Entry(window,textvariable=init_delay,width=10)
-init_delay_entry.grid(column=3,row=2)
+init_delay_entry.grid(column=3,row=3)
 def fill_ini(event=None):
     content = init_delay_entry.get()
     if content == '':
@@ -201,10 +219,10 @@ def fill_ini(event=None):
 init_delay_entry.bind('<FocusOut>',fill_ini)
 
 lbl4 = Label(window,text="Default delay in s")
-lbl4.grid(column=3, row = 3)
+lbl4.grid(column=3, row = 4)
 
 default_delay_entry = Entry(window,textvariable=default_delay,width=10)
-default_delay_entry.grid(column=3,row=4)
+default_delay_entry.grid(column=3,row=5)
 def fill_default(event=None):
     content = default_delay_entry.get()
     if content == '':
@@ -212,9 +230,9 @@ def fill_default(event=None):
 default_delay_entry.bind('<FocusOut>',fill_default)
 
 save_button = Button(window, text="Save", command = save_click)
-save_button.grid(column=3,row=5)
+save_button.grid(column=3,row=6)
 
 load_button = Button(window, text="Load", command = load_click)
-load_button.grid(column=3,row=6)
+load_button.grid(column=3,row=7)
 
 window.mainloop()

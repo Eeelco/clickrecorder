@@ -7,6 +7,7 @@ Small script to record the positions of mouse clicks and repeat them automatical
 - Supports left/right click only
 - Save and load click patterns
 - Set inital delay before the script starts clicking
+- (Optionally) Mimick human behavior by moving the mouse along a Bezier curve and not clicking pixel-perfectly
 - Scroll to stop the script from clicking
 - Currently, the upper speed limit is about 150 clicks per second if the delay is set to 0.
 
@@ -15,3 +16,4 @@ Small script to record the positions of mouse clicks and repeat them automatical
 - tk
 - pyautogui
 - pynput
+- numpy
