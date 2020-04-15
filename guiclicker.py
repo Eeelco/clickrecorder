@@ -119,7 +119,8 @@ def run_click():
                 break
             target_pos = np.asarray(positions[i]) + np.random.randint(-1,2,size=2)
             curve = random_bezier(np.asarray(pyautogui.position()), target_pos,0.2,node_nr)
-            interval = delays[i] / (node_nr-1)
+            # interval = delays[i] / (node_nr-1)
+            interval = (delays[i] + np.random.uniform(-0.1,0.1)) / (node_nr-1)
             for j in range(len(curve[0])):
                 moveTo(curve[0][j],curve[1][j],duration=interval)
             click(button=buttons[i])

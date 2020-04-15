@@ -43,6 +43,6 @@ def random_bezier(start_node, end_node, max_deviation,npoints):
 
     perpendicular_vec = np.random.choice([-1,1]) * np.asarray([dist[1], -dist[0]])/distnorm
 
-    mid_node = start_node + (0.1 + 0.8 * np.random.rand()) * dist + np.random.rand() * max_deviation * distnorm * perpendicular_vec
+    mid_node = start_node + np.random.uniform(0.1,0.9) * dist + np.random.uniform(0, max_deviation * distnorm) * perpendicular_vec
 
     return bezier_curve([start_node, mid_node, end_node],nTimes=npoints)
