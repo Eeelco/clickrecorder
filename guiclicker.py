@@ -33,6 +33,7 @@ window.title("Click recorder")
 frame_left.columnconfigure(0,minsize=120)
 frame_left.columnconfigure(1,minsize=180)
 frame_left.columnconfigure(2,minsize=50)
+frame_left.rowconfigure(1,pad=20)
 frame_left.grid(sticky='N')
 frame_right.grid(sticky='N')
 
@@ -201,7 +202,7 @@ reset_button.grid(column=2,row=0)
 run_button = Button(frame_left, textvariable=b3_text,command = run_click)
 run_button.grid(column=1,row=0)
 
-lbl = Label(frame_left, text="Positions")
+lbl = Label(frame_left, text="Clicks")
 lbl.grid(column=0,row=1)
 
 lbl2 = Label(frame_left, text = "Click delay in s")
