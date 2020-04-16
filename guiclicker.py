@@ -208,10 +208,10 @@ lbl2 = Label(frame_left, text = "Click delay in s")
 lbl2.grid(column=1,row=1)
 
 chk1 = Checkbutton(frame_right,text='Record\ndelays',variable=rec_dur)
-chk1.grid(column=0,row=0)
+chk1.grid(column=0,row=0,sticky='W')
 
 chk2 = Checkbutton(frame_right,text='Human-like\nmovement',variable=human_like)
-chk2.grid(column=0,row=1)
+chk2.grid(column=0,row=1,sticky='W')
 
 lbl3 = Label(frame_right,text="Initial delay in s")
 lbl3.grid(column=0, row = 2)
@@ -236,7 +236,7 @@ def fill_default(event=None):
 default_delay_entry.bind('<FocusOut>',fill_default)
 
 save_button = Button(frame_right, text="Save", command = save_click)
-save_button.grid(column=0,row=6)
+save_button.grid(column=0,row=6,pady=5)
 
 load_button = Button(frame_right, text="Load", command = load_click)
 load_button.grid(column=0,row=7)
