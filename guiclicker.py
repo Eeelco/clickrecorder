@@ -1,4 +1,4 @@
-from tkinter import (Tk, StringVar, IntVar, Entry, Label, Button, Checkbutton, filedialog, END, messagebox)
+from tkinter import (Tk, StringVar, IntVar, Entry, Label, Button, Checkbutton, filedialog, END, messagebox, Frame)
 from pyautogui import moveTo, click
 import pyautogui
 from pynput.mouse import Listener
@@ -24,19 +24,24 @@ recording = False
 running = False
 
 window = Tk()
+frame_left = Frame(window,padx=10,pady=10)
+frame_left.grid(row=0,column=0)
+frame_right = Frame(window,padx=10,pady=10)
+frame_right.grid(row=0,column=1)
 window.title("Click recorder")
-window.rowconfigure(0,pad=30)
-window.columnconfigure(0,minsize=120,pad=30)
-window.columnconfigure(1,minsize=180)
-window.columnconfigure(2,minsize=50)
-window.columnconfigure(3,pad=30)
 
-b1_text = StringVar(window)
-b3_text = StringVar(window)
-rec_dur = IntVar(window)
-human_like = IntVar(window)
-init_delay = StringVar(window)
-default_delay = StringVar(window)
+frame_left.columnconfigure(0,minsize=120)
+frame_left.columnconfigure(1,minsize=180)
+frame_left.columnconfigure(2,minsize=50)
+frame_left.grid(sticky='N')
+frame_right.grid(sticky='N')
+
+b1_text = StringVar(frame_left)
+b3_text = StringVar(frame_left)
+rec_dur = IntVar(frame_right)
+human_like = IntVar(frame_right)
+init_delay = StringVar(frame_right)
+default_delay = StringVar(frame_right)
 
 b1_text.set("Start recording")
 b3_text.set("Start clicks")
@@ -175,10 +180,10 @@ def make_inputs():
     j = len(position_labels)
     for i in range(j,len(positions)):
         p = positions[i]
-        position_labels.append(Label(window,text = f"{buttons[i][0].upper()} x: {p[0]:<4} y: {p[1]:<4}"))
+        position_labels.append(Label(frame_left,text = f"{buttons[i][0].upper()} x: {p[0]:<4} y: {p[1]:<4}"))
         position_labels[i].grid(column=0,row=i+2,sticky='w')
 
-        delay_inputs.append(Entry(window))
+        delay_inputs.append(Entry(frame_left))
         if  (i - j) < len(delays) - 1 and rec_dur.get():
             delay_inputs[i].insert(0,str((delays[i-j+1] - delays[i-j]).total_seconds() ) )
         else:
@@ -187,53 +192,53 @@ def make_inputs():
     delays = []
 
 
-record_button = Button(window,textvariable=b1_text, command = record_click)
+record_button = Button(frame_left,textvariable=b1_text, command = record_click)
 record_button.grid(column=0,row=0)
 
-reset_button = Button(window, text="Reset",command = reset_click)
+reset_button = Button(frame_left, text="Reset",command = reset_click)
 reset_button.grid(column=2,row=0)
 
-run_button = Button(window, textvariable=b3_text,command = run_click)
+run_button = Button(frame_left, textvariable=b3_text,command = run_click)
 run_button.grid(column=1,row=0)
 
-lbl = Label(window, text="Positions")
+lbl = Label(frame_left, text="Positions")
 lbl.grid(column=0,row=1)
 
-lbl2 = Label(window, text = "Click delay in s")
+lbl2 = Label(frame_left, text = "Click delay in s")
 lbl2.grid(column=1,row=1)
 
-chk1 = Checkbutton(window,text='Record\ndelays',variable=rec_dur)
-chk1.grid(column=3,row=0)
+chk1 = Checkbutton(frame_right,text='Record\ndelays',variable=rec_dur)
+chk1.grid(column=0,row=0)
 
-chk2 = Checkbutton(window,text='Human-like\nmovement',variable=human_like)
-chk2.grid(column=3,row=1)
+chk2 = Checkbutton(frame_right,text='Human-like\nmovement',variable=human_like)
+chk2.grid(column=0,row=1)
 
-lbl3 = Label(window,text="Initial delay in s")
-lbl3.grid(column=3, row = 2)
+lbl3 = Label(frame_right,text="Initial delay in s")
+lbl3.grid(column=0, row = 2)
 
-init_delay_entry = Entry(window,textvariable=init_delay,width=10)
-init_delay_entry.grid(column=3,row=3)
+init_delay_entry = Entry(frame_right,textvariable=init_delay,width=10)
+init_delay_entry.grid(column=0,row=3)
 def fill_ini(event=None):
     content = init_delay_entry.get()
     if content == '':
         init_delay_entry.insert(0,'1')
 init_delay_entry.bind('<FocusOut>',fill_ini)
 
-lbl4 = Label(window,text="Default delay in s")
-lbl4.grid(column=3, row = 4)
+lbl4 = Label(frame_right,text="Default delay in s")
+lbl4.grid(column=0, row = 4)
 
-default_delay_entry = Entry(window,textvariable=default_delay,width=10)
-default_delay_entry.grid(column=3,row=5)
+default_delay_entry = Entry(frame_right,textvariable=default_delay,width=10)
+default_delay_entry.grid(column=0,row=5)
 def fill_default(event=None):
     content = default_delay_entry.get()
     if content == '':
         default_delay_entry.insert(0,'1')
 default_delay_entry.bind('<FocusOut>',fill_default)
 
-save_button = Button(window, text="Save", command = save_click)
-save_button.grid(column=3,row=6)
+save_button = Button(frame_right, text="Save", command = save_click)
+save_button.grid(column=0,row=6)
 
-load_button = Button(window, text="Load", command = load_click)
-load_button.grid(column=3,row=7)
+load_button = Button(frame_right, text="Load", command = load_click)
+load_button.grid(column=0,row=7)
 
 window.mainloop()
