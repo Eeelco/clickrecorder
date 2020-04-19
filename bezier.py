@@ -34,7 +34,7 @@ def bezier_curve(points, nTimes=1000):
     xvals = np.dot(xPoints, polynomial_array)
     yvals = np.dot(yPoints, polynomial_array)
 
-    return [round(x) for x in xvals[::-1][1:]], [round(y) for y in yvals[::-1][1:]]
+    return zip([round(x) for x in xvals[::-1][1:]], [round(y) for y in yvals[::-1][1:]])
 
 
 def random_bezier(start_node, end_node, max_deviation,npoints):
@@ -45,4 +45,8 @@ def random_bezier(start_node, end_node, max_deviation,npoints):
 
     mid_node = start_node + np.random.uniform(0.1,0.9) * dist + np.random.uniform(0, max_deviation * distnorm) * perpendicular_vec
 
-    return bezier_curve([start_node, mid_node, end_node],nTimes=npoints)
+    bez =  bezier_curve([start_node, mid_node, end_node],nTimes=npoints)
+    # Remove duplicates
+    dedup = []
+    [dedup.append(x) for x in bez if x not in dedup]
+    return dedup, len(dedup)

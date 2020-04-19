@@ -98,7 +98,7 @@ def reset_click():
 
 def run_click():
     global running,delay_inputs
-    node_nr = 4
+    node_nr = 100
     b3_text.set("Running")
     if recording:
         record_click()
@@ -124,11 +124,11 @@ def run_click():
             if not running:
                 break
             target_pos = np.asarray(positions[i]) + np.random.randint(-1,2,size=2)
-            curve = random_bezier(np.asarray(pyautogui.position()), target_pos,0.2,node_nr)
-            # interval = delays[i] / (node_nr-1)
-            interval = (delays[i] + np.random.uniform(-0.1,0.1)) / (node_nr-1)
-            for j in range(len(curve[0])):
-                moveTo(curve[0][j],curve[1][j],duration=interval)
+            curve, n_pts = random_bezier(np.asarray(pyautogui.position()), target_pos,0.2,node_nr)
+            interval = (delays[i] + np.random.uniform(-0.1,0.1)) / n_pts
+            for j in curve:
+                sleep(interval)
+                moveTo(j[0],j[1])
             click(button=buttons[i])
 
 def save_click():
