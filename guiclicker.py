@@ -41,6 +41,7 @@ b1_text = StringVar(frame_left)
 b3_text = StringVar(frame_left)
 rec_dur = IntVar(frame_right)
 human_like = IntVar(frame_right)
+fixed_cycle_nr = IntVar(frame_right)
 init_delay = StringVar(frame_right)
 default_delay = StringVar(frame_right)
 
@@ -97,14 +98,15 @@ def reset_click():
     window.update()
 
 def run_click():
-    global running,delay_inputs
+    global running,delay_inputs,b3_text
     node_nr = 100
+    nr_clicks = len(positions)
     b3_text.set("Running")
     if recording:
         record_click()
     window.update()
     running = True
-    indices = cycle(range(len(positions)))
+    indices = cycle(range(nr_clicks))
     delays = [float(delay_inputs[i].get()) if delay_inputs[i].get() != '' else float(default_delay.get()) for i in range(len(positions))]
     delays = [delays[-1]] + delays[:-1]
 
@@ -112,24 +114,36 @@ def run_click():
     sleep(initial_delay)
     click(x=positions[0][0],y=positions[0][1],button=buttons[0])
 
+    j = 1
+    if fixed_cycle_nr.get():
+        j = int(fix_click_entry.get())
+
     next(indices)
     if not human_like.get():
         for i in indices:
-            if not running:
+            if not running or j < 1:
+                running = False
+                b3_text.set("Start clicks")
                 break
             moveTo(positions[i][0],positions[i][1], duration=delays[i])
             click(button=buttons[i])
+            if fixed_cycle_nr.get() and i == nr_clicks - 1:
+                j -= 1
     else:
         for i in indices:
-            if not running:
+            if not running or j < 1:
+                running = False
+                b3_text.set("Start clicks")
                 break
             target_pos = np.asarray(positions[i]) + np.random.randint(-1,2,size=2)
             curve, n_pts = random_bezier(np.asarray(pyautogui.position()), target_pos,0.2,node_nr)
             interval = (delays[i] + np.random.uniform(-0.1,0.1)) / n_pts
-            for j in curve:
+            for k in curve:
                 sleep(interval)
-                moveTo(j[0],j[1])
+                moveTo(k[0],k[1])
             click(button=buttons[i])
+            if fixed_cycle_nr.get() and i == nr_clicks - 1:
+                j -= 1
 
 def save_click():
     outfile = filedialog.asksaveasfilename(title="Filename",filetypes=(("Click save files", "*.cls"),("all files","*")))
@@ -236,10 +250,16 @@ def fill_default(event=None):
         default_delay_entry.insert(0,'1')
 default_delay_entry.bind('<FocusOut>',fill_default)
 
+fix_clicks = Checkbutton(frame_right,text='Fixed nr.\nof cycles',variable=fixed_cycle_nr)
+fix_clicks.grid(column=0,row=6,sticky='W')
+fix_click_entry = Entry(frame_right,width=10)
+fix_click_entry.grid(column=0,row=7)
+
+
 save_button = Button(frame_right, text="Save", command = save_click)
-save_button.grid(column=0,row=6,pady=5)
+save_button.grid(column=0,row=8,pady=5)
 
 load_button = Button(frame_right, text="Load", command = load_click)
-load_button.grid(column=0,row=7)
+load_button.grid(column=0,row=9)
 
 window.mainloop()
